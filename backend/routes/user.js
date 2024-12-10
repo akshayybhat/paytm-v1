@@ -2,15 +2,17 @@ const express = require('express');
 const router = express.Router();
 const zod = require("zod");
 const User = require("../db/main");
+const {jwt_secret} = require("../config");
+const jwt = require("jsonwebtoken")
 
-// testing route
-router.get("/rtestuser", ()=>{
-    console.log("works")
-})
+const createJWT = (payload) =>{
+    let token;
+    token = jwt.sign(payload, jwt_secret);
+    return token;
+}
 
 // signup route
 router.post("/signup", async (req, res)=>{
-
 
     // zod validation
     const newUser = zod.object({
@@ -37,7 +39,7 @@ router.post("/signup", async (req, res)=>{
         })
         return;
     }
-
+    console.log(jwt_secret);
     // create a user entry to db
     try {
         await User.create({
@@ -46,8 +48,10 @@ router.post("/signup", async (req, res)=>{
             firstname: req.body.firstname,
             lastname: req.body.lastname
         })
+
         res.status(200).json({
-            message: "User created successfully"
+            message: "User created successfully",
+            token: createJWT(username)
         })
     }catch(error){
         console.log("Error while creating User")
