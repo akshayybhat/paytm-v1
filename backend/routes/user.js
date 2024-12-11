@@ -104,12 +104,9 @@ router.put("/", authMiddleware, async (req, res)=>{
         return;
     }
 
-    // update not working
-    // TODO
-
+    const userUpdate = await User.findOneAndUpdate({userName: req.userId}, {password: req.body.password, firstname: req.body.firstname, lastname: req.body.lastname});
 
     if (userUpdate){
-        console.log(userUpdate);
         res.status(200).json({
             message: "Updated successfully"
         })
