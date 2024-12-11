@@ -4,6 +4,7 @@ const zod = require("zod");
 const User = require("../db/main");
 const {jwt_secret} = require("../config");
 const jwt = require("jsonwebtoken")
+const {authMiddleware} = require("../middleware")
 
 const createJWT = (payload) =>{
     let token;
@@ -16,10 +17,10 @@ router.post("/signup", async (req, res)=>{
 
     // zod validation
     const newUser = zod.object({
-        username: zod.string().email().trim(),
-        firstname: zod.string().max(15).trim(),
-        lastname: zod.string().max(10).trim(),
+        userName: zod.string().email().trim(),
         password: zod.string().trim().min(6),
+        firstname: zod.string().max(15).trim(),
+        lastname: zod.string().max(10).trim()
     })
 
     if (!(newUser.safeParse(req.body)).success){
@@ -30,9 +31,9 @@ router.post("/signup", async (req, res)=>{
     }
 
     // validation-checks if user entry already exists
-    const {username} = req.body
+    const {userName} = req.body
 
-    const userExist = await User.findOne({userName:username});
+    const userExist = await User.findOne({userName:userName});
     if (userExist) {
         res.status(411).json({
             message: "Email already taken / Incorrect inputs"
@@ -42,8 +43,9 @@ router.post("/signup", async (req, res)=>{
     
     // create a user entry to db
     try {
+
         await User.create({
-            userName: req.body.username,
+            userName: req.body.userName,
             password: req.body.password,
             firstname: req.body.firstname,
             lastname: req.body.lastname
@@ -51,20 +53,19 @@ router.post("/signup", async (req, res)=>{
 
         res.status(200).json({
             message: "User created successfully",
-            token: createJWT(username)
+            token: createJWT(userName)
         })
     }catch(error){
         console.log("Error while creating User")
         console.log(error);
     }
-
 })
 
 //sign-in route
 
 router.post("/signin", async(req,res)=>{
     const userSchema = zod.object({
-        username: zod.string().email().trim(),
+        userName: zod.string().email().trim(),
         password: zod.string().trim().min(6),
     })
 
@@ -74,14 +75,47 @@ router.post("/signin", async(req,res)=>{
         })
         return;
     }
-    const user = await User.exists({userName: req.body.username, password: req.body.password})
+    // if user already exists and creds match
+    const user = await User.exists({userName: req.body.userName, password: req.body.password})
     if (user){
         res.status(200).json({
-            token: createJWT(req.body.username)
+            token: createJWT(req.body.userName)
         });
     }else{
         res.status(411).json({
             message: "Error while logging in"
+        })
+    }
+})
+
+//update user details
+
+router.put("/", authMiddleware, async (req, res)=>{
+    const userDetailSchema = zod.object({
+        password: zod.string().trim().min(6).optional(),
+        firstname: zod.string().max(15).trim().optional(),
+        lastname: zod.string().max(10).trim().optional(),
+    })
+
+    if (!(userDetailSchema.safeParse(req.body)).success){
+        res.status(411).json({
+            message: "Error while updating information"
+        })
+        return;
+    }
+
+    // update not working
+    // TODO
+
+
+    if (userUpdate){
+        console.log(userUpdate);
+        res.status(200).json({
+            message: "Updated successfully"
+        })
+    }else{
+        res.status(411).json({
+            message: "Error while updating information"
         })
     }
 

@@ -7,10 +7,10 @@ mongoose.connect("mongodb://localhost:27017/paytm").then(()=>{
 
 // define schema for User model
 const userSchema = new mongoose.Schema({
-    userName : {type: String, required: true},
+    userName : {type: String, required: true,},
     password: {type: String, required: true},
-    firstName: String,
-    lastName: String,
+    firstname: {type: String, required: true},
+    lastname: String,
 })
 
 const User = mongoose.model("User", userSchema);
