@@ -39,7 +39,7 @@ router.post("/signup", async (req, res)=>{
         })
         return;
     }
-    console.log(jwt_secret);
+    
     // create a user entry to db
     try {
         await User.create({
@@ -60,6 +60,32 @@ router.post("/signup", async (req, res)=>{
 
 })
 
+//sign-in route
+
+router.post("/signin", async(req,res)=>{
+    const userSchema = zod.object({
+        username: zod.string().email().trim(),
+        password: zod.string().trim().min(6),
+    })
+
+    if (!(userSchema.safeParse(req.body)).success){
+        res.status(411).json({
+            message: "Incorrect inputs"
+        })
+        return;
+    }
+    const user = await User.exists({userName: req.body.username, password: req.body.password})
+    if (user){
+        res.status(200).json({
+            token: createJWT(req.body.username)
+        });
+    }else{
+        res.status(411).json({
+            message: "Error while logging in"
+        })
+    }
+
+})
 
 
 
