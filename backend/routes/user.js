@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const zod = require("zod");
-const {User} = require("../db/main");
+const {User,Accounts} = require("../db/main");
 const {jwt_secret} = require("../config");
 const jwt = require("jsonwebtoken")
 const {authMiddleware} = require("../middleware")
@@ -20,7 +20,7 @@ router.post("/signup", async (req, res)=>{
         userName: zod.string().email().trim(),
         password: zod.string().trim().min(6),
         firstname: zod.string().max(15).trim(),
-        lastname: zod.string().max(10).trim()
+        lastname: zod.string().max(10).trim(),
     })
 
     if (!(newUser.safeParse(req.body)).success){
@@ -44,11 +44,17 @@ router.post("/signup", async (req, res)=>{
     // create a user entry to db
     try {
 
-        await User.create({
+        const user = await User.create({
             userName: req.body.userName,
             password: req.body.password,
             firstname: req.body.firstname,
             lastname: req.body.lastname
+        })
+        const userId = user._id;
+
+        await Accounts.create({
+            userId: userId,
+            balance: 1+Math.random() * 10000
         })
 
         res.status(200).json({
