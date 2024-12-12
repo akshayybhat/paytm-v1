@@ -1,4 +1,5 @@
 const mongoose = require ('mongoose');
+const {string} = require("zod");
 
 
 mongoose.connect("mongodb://localhost:27017/paytm").then(()=>{
@@ -13,7 +14,14 @@ const userSchema = new mongoose.Schema({
     lastname: String,
 })
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema)
+
+const accountSchema = new mongoose.Schema({
+    userId: {type: mongoose.Schema.Types.ObjectId, ref: User, required: true},
+    balance: {type:Number, required: true}
+})
+
+const Accounts = mongoose.model("Accounts", accountSchema);
 
 
-module.exports = User;
+module.exports = {User,Accounts};

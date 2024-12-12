@@ -3,7 +3,7 @@ const {jwt_secret} = require("./config");
 
 const authMiddleware = (req, res, next)=>{
     const jwt = req.headers.authorization;
-    console.log(jwt);
+
     if (!(jwt || jwt.startsWith("Bearer"))){
         res.status(403).json({
             message: "Incorrect Inputs"

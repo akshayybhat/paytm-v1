@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const zod = require("zod");
-const User = require("../db/main");
+const {User} = require("../db/main");
 const {jwt_secret} = require("../config");
 const jwt = require("jsonwebtoken")
 const {authMiddleware} = require("../middleware")
@@ -118,6 +118,18 @@ router.put("/", authMiddleware, async (req, res)=>{
 
 })
 
-
+router.get("/bulk", authMiddleware, async (req, res)=>{
+    const userRequested = req.query.filter;
+    let userDetails = [];
+    let tempDetails = await User.find({$or:[{firstname: userRequested}, {lastname:userRequested}]});
+    if (tempDetails){
+        tempDetails.map((elements)=>{
+            userDetails.push({firstname:elements.firstname, lastname:elements.lastname, _id:elements._id});
+        })
+    }
+    res.status(200).json({
+        message: {userDetails}
+    })
+})
 
 module.exports = router;
