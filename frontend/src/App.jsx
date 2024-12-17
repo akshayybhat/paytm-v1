@@ -1,19 +1,11 @@
-import React from "react";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
-
-const SignupPage = React.lazy(() => import("./pages/SignupPage.jsx"));
-function App() {
-
-  return (
-    <div>
-        Hello world
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignupPage from "./pages/SignupPage.jsx";
+export default function App (){
+    return(
         <BrowserRouter>
             <Routes>
-                <Route path="/signup" element={<SignupPage/>}/>
+                <Route path="/signup" element={<SignupPage />}/>
             </Routes>
         </BrowserRouter>
-    </div>
-  )
+    )
 }
-
-export default App
