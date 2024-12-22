@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
+import Button from "./ButtonComponent.jsx";
 
 export default function UsersList(){
     let [allUsers, setallUsers] = useState([])
     useEffect(() => {
-        setallUsers([{name:"Harkirat"}])
+        setallUsers([{name:"Harkirat Singh"}, {name:"Harkirat Singh"}])
     }, []);
     return(
         <div>
@@ -15,7 +16,7 @@ export default function UsersList(){
                 </div>
                 <div>
                     {allUsers.map((user)=> {
-                        return <p key={user.name}>{user.name}</p>
+                        return <Users user={user} key={user.name}/>
                     })}
 
                 </div>
@@ -31,10 +32,10 @@ function Users({user}){
     return (
         <div className="flex flex-wrap items-center justify-between m-2 p-3 px-0 mx-0">
             <div>
-                <span>H</span> Harkirat Singh
+                <span className="border-gray-100 bg-slate-300 p-2 m-1 border-2 rounded-full">H</span> {user.name}
             </div>
             <div>
-                <button>Send Money</button>
+                <Button label="Send Money" />
             </div>
         </div>
     )
